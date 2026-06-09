@@ -22,8 +22,9 @@ export const TipsPage: React.FC = () => {
         if (res.data.success) {
           setTips(res.data.data);
         }
-      } catch (err: any) {
-        showToastError(err.message || 'Failed to retrieve reduction tips.', 'Fetch Error');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to retrieve reduction tips.';
+        showToastError(message, 'Fetch Error');
       } finally {
         setIsLoading(false);
       }

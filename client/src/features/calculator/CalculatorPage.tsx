@@ -27,8 +27,9 @@ export const CalculatorPage: React.FC = () => {
         success('Travel carbon calculation complete.');
         if (isAuthenticated) refreshProfile(); // Refresh profile values if saved
       }
-    } catch (err: any) {
-      showToastError(err.message || 'Failed to calculate emissions. Please check inputs.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to calculate emissions. Please check inputs.';
+      showToastError(message);
     } finally {
       setIsLoading(false);
     }
@@ -43,8 +44,9 @@ export const CalculatorPage: React.FC = () => {
         success('Energy carbon calculation complete.');
         if (isAuthenticated) refreshProfile();
       }
-    } catch (err: any) {
-      showToastError(err.message || 'Failed to calculate emissions. Please check inputs.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to calculate emissions. Please check inputs.';
+      showToastError(message);
     } finally {
       setIsLoading(false);
     }
@@ -59,8 +61,9 @@ export const CalculatorPage: React.FC = () => {
         success('Dietary carbon calculation complete.');
         if (isAuthenticated) refreshProfile();
       }
-    } catch (err: any) {
-      showToastError(err.message || 'Failed to calculate emissions. Please check inputs.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to calculate emissions. Please check inputs.';
+      showToastError(message);
     } finally {
       setIsLoading(false);
     }

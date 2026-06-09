@@ -48,15 +48,18 @@ export const DashboardPage: React.FC = () => {
       if (summaryRes.data.success) setSummaryData(summaryRes.data.data);
       if (trendsRes.data.success) setTrendData(trendsRes.data.data);
       if (tipsRes.data.success) setPersonalizedTips(tipsRes.data.data);
-    } catch (err: any) {
-      showToastError(err.message || 'Failed to populate dashboard stats.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to populate dashboard stats.';
+      showToastError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleQuickCalculate = async (e: React.FormEvent) => {
@@ -78,8 +81,9 @@ export const DashboardPage: React.FC = () => {
         // Refresh dashboard data
         fetchData();
       }
-    } catch (err: any) {
-      showToastError(err.message || 'Quick calculation failed.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Quick calculation failed.';
+      showToastError(message);
     } finally {
       setIsCalculatingQuick(false);
     }

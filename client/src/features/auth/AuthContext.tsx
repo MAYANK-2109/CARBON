@@ -12,6 +12,7 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -20,15 +21,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuth = useCallback(async () => {
     try {
-      setIsLoading(true);
-      const res = await api.get<{ success: boolean; data: { user: UserProfile } }>('/auth/profile');
+      const res = await api.get<{ success: boolean; data: { user: UserProfile } }>('/auth/me');
       if (res.data.success && res.data.data.user) {
         setUser(res.data.data.user);
       } else {
         setUser(null);
       }
-    } catch (err) {
-      // If unauthorized, user is simply not logged in
+    } catch {
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -36,8 +35,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsLoading(true);
     checkAuth();
   }, [checkAuth]);
+
+  // ─── Silent Refresh Failure Handler ──────────────────────────────────────
+  // The API interceptor dispatches 'auth:logout' when the refresh token is also
+  // expired/invalid. We clear user state here so ProtectedRoute can redirect to
+  // /login once — no repeated login loop.
+  useEffect(() => {
+    const handleForceLogout = () => {
+      setUser(null);
+      setIsLoading(false);
+    };
+    window.addEventListener('auth:logout', handleForceLogout);
+    return () => window.removeEventListener('auth:logout', handleForceLogout);
+  }, []);
 
   const login = async (credentials: LoginInput) => {
     setIsLoading(true);
@@ -83,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     try {
-      const res = await api.get<{ success: boolean; data: { user: UserProfile } }>('/auth/profile');
+      const res = await api.get<{ success: boolean; data: { user: UserProfile } }>('/auth/me');
       if (res.data.success && res.data.data.user) {
         setUser(res.data.data.user);
       }

@@ -34,8 +34,9 @@ export const HistoryPage: React.FC = () => {
         if (historyRes.data.success) setHistoryData(historyRes.data.data);
         if (summaryRes.data.success) setSummaryData(summaryRes.data.data);
         if (trendsRes.data.success) setTrendData(trendsRes.data.data);
-      } catch (err: any) {
-        showToastError(err.message || 'Failed to retrieve history logs.', 'Fetch Error');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to retrieve history logs.';
+        showToastError(message, 'Fetch Error');
       } finally {
         setIsLoading(false);
       }

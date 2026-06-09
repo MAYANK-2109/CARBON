@@ -52,6 +52,7 @@ export const TravelForm: React.FC<TravelFormProps> = ({ onSubmit, isLoading }) =
   // Adjust conditional fields based on vehicle type
   useEffect(() => {
     if (formData.vehicleType === 'car') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(prev => ({
         ...prev,
         fuelType: prev.fuelType || 'petrol',

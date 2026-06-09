@@ -1,3 +1,5 @@
+import { api } from '../../lib/api';
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -13,22 +15,10 @@ export async function sendMessage(
   userId: string | undefined,
   messages: ChatMessage[]
 ): Promise<{ reply: string }> {
-  const response = await fetch('/api/chat/message', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // If authentication token is stored in a cookie, it will be sent automatically.
-    },
-    body: JSON.stringify({ messages, userId }),
-    credentials: 'include',
+  const response = await api.post<{ success: boolean; data: { reply: string } }>('/chat/message', {
+    messages,
+    userId,
   });
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Chat API error: ${response.status} ${err}`);
-  }
-
-  const data = await response.json();
-  // Expected shape: { success: true, data: { reply: string } }
-  return data.data;
+  return response.data.data;
 }

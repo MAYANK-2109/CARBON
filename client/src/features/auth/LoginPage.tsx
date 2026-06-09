@@ -18,7 +18,7 @@ export const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get path to redirect back to, default to dashboard
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,8 +50,9 @@ export const LoginPage: React.FC = () => {
       await login(formData);
       success('You have successfully signed in.', 'Welcome Back!');
       navigate(from, { replace: true });
-    } catch (err: any) {
-      showToastError(err.message || 'Failed to authenticate. Please check your credentials.', 'Authentication Failed');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to authenticate. Please check your credentials.';
+      showToastError(message, 'Authentication Failed');
     } finally {
       setIsSubmitting(false);
     }
