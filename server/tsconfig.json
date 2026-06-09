@@ -7,7 +7,6 @@
     "ignoreDeprecations": "6.0",
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["node"],
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
