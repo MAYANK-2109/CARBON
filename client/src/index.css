@@ -1,0 +1,9 @@
+/**
+ * @module client/index
+ * @description Root stylesheet importing global styles.
+ */
+
+@import './styles/tokens.css';
+@import './styles/glassmorphism.css';
+@import './styles/bento.css';
+@import './styles/animations.css';

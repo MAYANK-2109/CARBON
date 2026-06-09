@@ -1,0 +1,121 @@
+/**
+ * @module client/styles/bento
+ * @description Responsive bento grid layout classes.
+ */
+
+.bento-container {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* Base spans (Mobile: stack everything or allow small columns) */
+@media (max-width: 767px) {
+  .bento-container {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 16px;
+  }
+  
+  .span-1, .span-2, .span-3, .span-4, .span-5, .span-6, 
+  .span-7, .span-8, .span-9, .span-10, .span-11, .span-12 {
+    grid-column: span 1 / span 1 !important;
+  }
+}
+
+/* Tablet: 6 columns */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .bento-container {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  
+  .span-1 { grid-column: span 1 / span 1; }
+  .span-2 { grid-column: span 2 / span 2; }
+  .span-3 { grid-column: span 3 / span 3; }
+  .span-4 { grid-column: span 4 / span 4; }
+  .span-5 { grid-column: span 5 / span 5; }
+  .span-6 { grid-column: span 6 / span 6; }
+  
+  .span-7, .span-8 { grid-column: span 4 / span 4; }
+  .span-9, .span-10 { grid-column: span 5 / span 5; }
+  .span-11, .span-12 { grid-column: span 6 / span 6; }
+}
+
+/* Desktop: 12 columns */
+@media (min-width: 1024px) {
+  .span-1 { grid-column: span 1 / span 1; }
+  .span-2 { grid-column: span 2 / span 2; }
+  .span-3 { grid-column: span 3 / span 3; }
+  .span-4 { grid-column: span 4 / span 4; }
+  .span-5 { grid-column: span 5 / span 5; }
+  .span-6 { grid-column: span 6 / span 6; }
+  .span-7 { grid-column: span 7 / span 7; }
+  .span-8 { grid-column: span 8 / span 8; }
+  .span-9 { grid-column: span 9 / span 9; }
+  .span-10 { grid-column: span 10 / span 10; }
+  .span-11 { grid-column: span 11 / span 11; }
+  .span-12 { grid-column: span 12 / span 12; }
+}
+
+/* Bento Tile internal styling */
+.bento-tile {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.bento-tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.bento-tile-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bento-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.bento-tile-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Helper flex layout utilities */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

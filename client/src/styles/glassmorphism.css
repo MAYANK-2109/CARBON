@@ -1,0 +1,250 @@
+/**
+ * @module client/styles/glassmorphism
+ * @description Glassmorphism styles and helper classes.
+ */
+
+.glass-panel {
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition-normal), 
+              box-shadow var(--transition-normal), 
+              transform var(--transition-normal);
+}
+
+.glass-panel-hover:hover {
+  border-color: var(--border-glass-hover);
+  background: rgba(15, 16, 22, 0.75);
+  box-shadow: var(--shadow-lg);
+}
+
+.glass-panel-interactive:active {
+  border-color: var(--border-glass-active);
+  background: rgba(15, 16, 22, 0.85);
+}
+
+/* Glass Card Glow Variants */
+.glass-glow-emerald {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(16, 185, 129, 0.05);
+}
+.glass-glow-emerald:hover {
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.glass-glow-sky {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(14, 165, 233, 0.05);
+}
+.glass-glow-sky:hover {
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.glass-glow-amber {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(245, 158, 11, 0.05);
+}
+.glass-glow-amber:hover {
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.glass-glow-rose {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(244, 63, 94, 0.05);
+}
+.glass-glow-rose:hover {
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.glass-glow-violet {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(139, 92, 246, 0.05);
+}
+.glass-glow-violet:hover {
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* Glass Input Controls */
+.glass-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  transition: border-color var(--transition-fast), 
+              background-color var(--transition-fast), 
+              box-shadow var(--transition-fast);
+}
+
+.glass-input:hover {
+  border-color: var(--border-glass-hover);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.glass-input:focus {
+  border-color: var(--accent-teal);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.glass-input::placeholder {
+  color: var(--text-muted);
+}
+
+.glass-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* Glass Select Dropdowns */
+.glass-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.glass-select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Glass Buttons */
+.glass-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  border: 1px solid transparent;
+}
+
+.glass-btn-primary {
+  background: linear-gradient(135deg, var(--accent-teal), var(--accent-emerald));
+  color: #042f2e;
+}
+.glass-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-emerald);
+}
+.glass-btn-primary:active {
+  transform: translateY(0);
+}
+
+.glass-btn-secondary {
+  background: var(--bg-glass);
+  border-color: var(--border-glass);
+  color: var(--text-primary);
+}
+.glass-btn-secondary:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+}
+.glass-btn-secondary:active {
+  transform: translateY(0);
+}
+
+.glass-btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.glass-btn-ghost:hover {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.glass-btn-rose {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.2);
+  color: #fda4af;
+}
+.glass-btn-rose:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: var(--text-primary);
+  box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
+}
+
+/* Glass Badges */
+.glass-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-badge-emerald {
+  background: rgba(16, 185, 129, 0.1);
+  color: #a7f3d0;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.glass-badge-sky {
+  background: rgba(14, 165, 233, 0.1);
+  color: #bae6fd;
+  border-color: rgba(14, 165, 233, 0.2);
+}
+
+.glass-badge-amber {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fde68a;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.glass-badge-rose {
+  background: rgba(244, 63, 94, 0.1);
+  color: #fecdd3;
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+.glass-badge-violet {
+  background: rgba(139, 92, 246, 0.1);
+  color: #ddd6fe;
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Glass Tables */
+.glass-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.glass-table th {
+  padding: 16px;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.glass-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+}
+
+.glass-table tr:last-child td {
+  border-bottom: none;
+}
+
+.glass-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.01);
+}
