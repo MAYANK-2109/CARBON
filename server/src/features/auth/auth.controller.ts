@@ -9,10 +9,12 @@ import { registerUser, loginUser, refreshTokens, getUserProfile } from './auth.s
 import { env } from '../../config/environment';
 
 /** Cookie options for secure token storage */
+const isProdOrCloud = env.isProduction || !!process.env.RENDER || process.env.NODE_ENV === 'production';
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: env.isProduction,
-  sameSite: env.isProduction ? ('none' as const) : ('lax' as const),
+  secure: isProdOrCloud,
+  sameSite: isProdOrCloud ? ('none' as const) : ('lax' as const),
   path: '/',
 };
 
