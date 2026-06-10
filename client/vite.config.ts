@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -25,5 +24,5 @@ export default defineConfig({
         'src/**/*.spec.{ts,tsx}',
       ],
     },
-  },
-});
+  } as any,
+} as any);
