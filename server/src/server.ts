@@ -24,8 +24,31 @@ const app = express();
 
 // ─── Security Middleware ─────────────────────────────────
 app.use(helmet());
+
+// Split CORS_ORIGIN by comma to support multiple origins, and fallback to localhost
+const allowedOrigins = (env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, '')); // trim and remove trailing slashes
+
 app.use(cors({
-  origin: env.CORS_ORIGIN,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if the origin matches our allowed list, localhost, or any vercel.app subdomain
+    const isAllowed =
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.startsWith('http://localhost:');
+
+    if (isAllowed) {
+      callback(null, origin);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
