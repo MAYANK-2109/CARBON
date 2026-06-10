@@ -16,21 +16,4 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-  ],
-  webServer: [
-    {
-      command: 'npm run dev:server',
-      url: 'http://127.0.0.1:3000/api/health',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../',
-      timeout: 120 * 1000,
-    },
-    {
-      command: 'npm run dev:client',
-      url: 'http://127.0.0.1:5173',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../',
-      timeout: 120 * 1000,
-    }
-  ],
 });
