@@ -60,7 +60,7 @@ export const ChatPage: React.FC = () => {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, [input]);
 
-  const executeLogActivity = async (payload: { category: string; data: any }) => {
+  const executeLogActivity = async (payload: { category: string; data: Record<string, unknown> }) => {
     try {
       let endpoint = '';
       if (payload.category === 'travel') {
@@ -74,7 +74,7 @@ export const ChatPage: React.FC = () => {
         return;
       }
 
-      const res = await api.post<{ success: boolean; data: any }>(endpoint, payload.data);
+      const res = await api.post<{ success: boolean; data: unknown }>(endpoint, payload.data);
       if (res.data.success) {
         showSuccessToast(
           `Logged activity successfully: ${payload.category.toUpperCase()}`,
@@ -82,9 +82,10 @@ export const ChatPage: React.FC = () => {
         );
         if (isAuthenticated) refreshProfile();
       }
-    } catch (err: any) {
-      console.error('Auto-logging activity failed:', err);
-      showErrorToast(`Failed to automatically log activity from chat: ${err.message || err}`);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Auto-logging activity failed:', error);
+      showErrorToast(`Failed to automatically log activity from chat: ${error.message || error}`);
     }
   };
 
@@ -120,9 +121,10 @@ export const ChatPage: React.FC = () => {
           showErrorToast('Failed to parse activity data suggested by assistant.');
         }
       }
-    } catch (err: any) {
-      console.error('Chat error', err);
-      showErrorToast(err.message || 'Sorry, something went wrong with the AI assistant.');
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Chat error', error);
+      showErrorToast(error.message || 'Sorry, something went wrong with the AI assistant.');
     } finally {
       setLoading(false);
       // Refocus input

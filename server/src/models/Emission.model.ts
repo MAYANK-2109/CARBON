@@ -55,11 +55,11 @@ const EmissionSchema = new Schema<IEmission>(
   {
     timestamps: { createdAt: true, updatedAt: false },
     toJSON: {
-      transform(_doc, ret: any) {
-        ret.id = ret._id.toString();
-        ret.userId = ret.userId.toString();
-        delete ret._id;
-        delete ret.__v;
+      transform(_doc, ret: Record<string, unknown>) {
+        ret['id'] = String(ret['_id']);
+        ret['userId'] = String(ret['userId']);
+        delete ret['_id'];
+        delete ret['__v'];
         return ret;
       },
     },

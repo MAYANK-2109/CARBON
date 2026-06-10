@@ -11,7 +11,11 @@ export const PageShell: React.FC<PageShellProps> = ({ children }) => {
   const { user } = useAuth();
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div 
+      style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}
+      role="application"
+      aria-label="Application shell"
+    >
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">
         Skip to main content

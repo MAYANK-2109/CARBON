@@ -84,9 +84,10 @@ ${contextPrompt}`;
     });
 
     return response.text || 'I encountered an issue generating a response. Please try again.';
-  } catch (error: any) {
-    console.error('Gemini API Error:', error);
-    return `[Gemini Error] I am currently operating in demo fallback mode because: "${error.message || 'API request failed'}".\n\n${getMockChatResponse(currentMessage, summary)}`;
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Gemini API Error:', err);
+    return `[Gemini Error] I am currently operating in demo fallback mode because: "${err.message || 'API request failed'}".\n\n${getMockChatResponse(currentMessage, summary)}`;
   }
 }
 

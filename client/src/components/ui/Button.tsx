@@ -42,6 +42,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={`glass-btn ${getVariantClass()} ${className} ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
       style={buttonStyle}
       disabled={disabled || isLoading}
+      aria-busy={isLoading}
       {...props}
     >
       {isLoading && (

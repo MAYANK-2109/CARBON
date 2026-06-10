@@ -50,8 +50,9 @@ export const LoginPage: React.FC = () => {
       await login(formData);
       success('You have successfully signed in.', 'Welcome Back!');
       navigate(from, { replace: true });
-    } catch (err: any) {
-      const message = err?.message || 'Failed to authenticate. Please check your credentials.';
+    } catch (err: unknown) {
+      const error = err as Error;
+      const message = error?.message || 'Failed to authenticate. Please check your credentials.';
       showToastError(message, 'Authentication Failed');
     } finally {
       setIsSubmitting(false);

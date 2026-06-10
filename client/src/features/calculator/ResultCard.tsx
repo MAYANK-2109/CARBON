@@ -29,6 +29,8 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
     >
       {/* Hero Carbon Output */}
       <div
+        role="region"
+        aria-labelledby="carbon-result-title"
         style={{
           padding: '32px 24px',
           borderRadius: 'var(--radius-xl)',
@@ -57,11 +59,15 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
           }}
         />
 
-        <span style={{ fontSize: '14px', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase' }}>
+        <span 
+          id="carbon-result-title"
+          style={{ fontSize: '14px', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase' }}
+        >
           Calculated Carbon Emissions
         </span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '12px 0' }}>
           <span
+            aria-label={`${formatNumber(result.totalCo2eKg)} kilograms of carbon dioxide equivalent`}
             style={{
               fontSize: '56px',
               fontFamily: 'var(--font-heading)',
@@ -73,7 +79,10 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
           >
             {formatNumber(result.totalCo2eKg)}
           </span>
-          <span style={{ fontSize: '20px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          <span 
+            aria-hidden="false"
+            style={{ fontSize: '20px', color: 'var(--text-secondary)', fontWeight: 500 }}
+          >
             kg CO₂e
           </span>
         </div>
@@ -92,7 +101,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
           }}
         >
           <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Annualized equivalent:</span>
-          <span>{formatNumber(result.annualizedCo2eKg)} kg / year</span>
+          <span aria-label={`${formatNumber(result.annualizedCo2eKg)} kilograms per year`}>{formatNumber(result.annualizedCo2eKg)} kg / year</span>
         </div>
 
         {isAuthenticated && (
@@ -104,13 +113,21 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
 
       {/* Granular Breakdown */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
-        <h4 style={{ fontSize: '15px', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)', fontWeight: 500 }}>
+        <h4 
+          style={{ fontSize: '15px', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)', fontWeight: 500 }}
+        >
           Category Breakdown
         </h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div 
+          role="region"
+          aria-labelledby="breakdown-title"
+          style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+        >
           {result.breakdown.map((item) => (
             <div
               key={item.subcategory}
+              role="article"
+              aria-label={`${item.subcategory}: ${formatNumber(item.co2eKg)} kilograms, ${formatNumber(item.percentage)} percent of total`}
               style={{
                 padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
@@ -129,7 +146,14 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
                   {formatNumber(item.co2eKg)} kg ({formatNumber(item.percentage)}%)
                 </span>
               </div>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div 
+                style={{ width: '100%', height: '4px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '2px', overflow: 'hidden' }}
+                role="progressbar"
+                aria-valuenow={item.percentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${item.subcategory} emissions progress: ${formatNumber(item.percentage)}%`}
+              >
                 <div
                   style={{
                     width: `${item.percentage}%`,
@@ -150,9 +174,15 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
         <h4 style={{ fontSize: '15px', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)', fontWeight: 500 }}>
           Environmental Equivalents
         </h4>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+        <div 
+          role="region"
+          aria-labelledby="equivalents-title"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}
+        >
           {/* Trees */}
           <div
+            role="article"
+            aria-label={`Trees needed per year: ${formatNumber(result.equivalents.treesNeeded)}`}
             style={{
               padding: '16px',
               borderRadius: 'var(--radius-lg)',
@@ -165,7 +195,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
               textAlign: 'center'
             }}
           >
-            <Trees size={24} style={{ color: 'var(--accent-emerald)' }} />
+            <Trees size={24} style={{ color: 'var(--accent-emerald)' }} aria-hidden="true" />
             <span style={{ fontSize: '20px', fontFamily: 'var(--font-heading)', fontWeight: 700, color: 'var(--text-primary)' }}>
               {formatNumber(result.equivalents.treesNeeded)}
             </span>
@@ -176,6 +206,8 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
 
           {/* Car */}
           <div
+            role="article"
+            aria-label={`Kilometers driven equivalent: ${formatNumber(result.equivalents.drivingKm)}`}
             style={{
               padding: '16px',
               borderRadius: 'var(--radius-lg)',
@@ -188,7 +220,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, onReset, isAuthe
               textAlign: 'center'
             }}
           >
-            <Car size={24} style={{ color: 'var(--accent-amber)' }} />
+            <Car size={24} style={{ color: 'var(--accent-amber)' }} aria-hidden="true" />
             <span style={{ fontSize: '20px', fontFamily: 'var(--font-heading)', fontWeight: 700, color: 'var(--text-primary)' }}>
               {formatNumber(result.equivalents.drivingKm)}
             </span>
