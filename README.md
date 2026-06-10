@@ -30,16 +30,6 @@ CARBON/
 - Node.js >= 18.x
 - MongoDB (local or Atlas)
 
-### 2. Environment Setup
-Create a `.env` file in the root directory:
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27000/carbon
-JWT_SECRET=super-secret-jwt-key
-JWT_REFRESH_SECRET=super-secret-refresh-key
-ENCRYPTION_KEY=32_bytes_hex_string_for_aes_gcm
-FRONTEND_URL=http://localhost:5173
-NODE_ENV=development
 ```
 
 ### 3. Installation
