@@ -192,5 +192,17 @@ describe('History Service', () => {
 
       expect(result).toHaveLength(0);
     });
+
+    it('falls back to empty string for an invalid month index', async () => {
+      vi.spyOn(Emission, 'aggregate').mockResolvedValue([
+        { _id: { year: 2025, month: 99, category: 'travel' }, total: 10 },
+      ]);
+
+      const result = await getMonthlyTrends(VALID_USER_ID, 6);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.month).toBe(''); // Out of bounds index
+      expect(result[0]?.year).toBe(2025);
+    });
   });
 });

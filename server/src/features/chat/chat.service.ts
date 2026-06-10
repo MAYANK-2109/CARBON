@@ -7,9 +7,15 @@ import { GoogleGenAI } from '@google/genai';
 import { env } from '../../config/environment';
 import type { EmissionSummary } from '@carbon/shared';
 
-// Initialize the SDK if a valid-looking API key is present
-const hasApiKey = env.GEMINI_API_KEY && env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
-const ai = hasApiKey ? new GoogleGenAI({ apiKey: env.GEMINI_API_KEY }) : null;
+// Lazy initialization of the SDK
+let ai: GoogleGenAI | null | undefined = undefined;
+
+function getAiClient(): GoogleGenAI | null {
+  if (ai !== undefined) return ai;
+  const hasApiKey = env.GEMINI_API_KEY && env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
+  ai = hasApiKey ? new GoogleGenAI({ apiKey: env.GEMINI_API_KEY }) : null;
+  return ai;
+}
 
 /** Gemini model used for chat responses */
 const GEMINI_MODEL = 'gemini-2.5-flash';
@@ -68,7 +74,8 @@ Boundaries:
 ${contextPrompt}`;
 
   // 2. Demo fallback if no API key is provided
-  if (!ai) {
+  const client = getAiClient();
+  if (!client) {
     return getMockChatResponse(currentMessage, summary);
   }
 
@@ -80,7 +87,7 @@ ${contextPrompt}`;
       parts: [{ text: msg.content }],
     }));
 
-    const response = await ai.models.generateContent({
+    const response = await client.models.generateContent({
       model: GEMINI_MODEL,
       contents,
       config: {

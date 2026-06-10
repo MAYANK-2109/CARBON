@@ -108,15 +108,35 @@ describe('Chat Service', () => {
     );
   });
 
-  it('falls back gracefully when Gemini API throws an error', async () => {
+  it('falls back gracefully when Gemini API throws an Error object', async () => {
     mockGenerateContent.mockRejectedValueOnce(new Error('Network error'));
 
     const messages = [{ role: 'user' as const, content: 'travel tips' }];
     const response = await generateChatResponse(messages, null);
 
-    // Should fall back to demo mode response
     expect(typeof response).toBe('string');
-    expect(response.length).toBeGreaterThan(0);
+    expect(response).toContain('Network error');
+  });
+
+  it('falls back gracefully when Gemini API throws a non-Error object (string)', async () => {
+    // Throws a string instead of an Error to hit the fallback branch
+    mockGenerateContent.mockRejectedValueOnce('Some string error');
+
+    const messages = [{ role: 'user' as const, content: 'travel tips' }];
+    const response = await generateChatResponse(messages, null);
+
+    // Should fall back to "API request failed"
+    expect(response).toContain('API request failed');
+  });
+
+  it('returns fallback message if API responds with empty text', async () => {
+    // Mock the API to return falsy text
+    mockGenerateContent.mockResolvedValueOnce({ text: '' });
+
+    const messages = [{ role: 'user' as const, content: 'Hello' }];
+    const response = await generateChatResponse(messages, null);
+
+    expect(response).toBe('I encountered an issue generating a response. Please try again.');
   });
 });
 

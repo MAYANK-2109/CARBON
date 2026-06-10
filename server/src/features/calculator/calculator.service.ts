@@ -88,21 +88,21 @@ export function calculateEnergy(input: EnergyInput): CalculationResult {
     breakdown.push({
       subcategory: 'electricity',
       co2eKg: roundTo(electricityCo2e, 2),
-      percentage: total > 0 ? roundTo((electricityCo2e / total) * 100, 1) : 0,
+      percentage: roundTo((electricityCo2e / total) * 100, 1),
     });
   }
   if (gasCo2e > 0) {
     breakdown.push({
       subcategory: 'natural gas',
       co2eKg: roundTo(gasCo2e, 2),
-      percentage: total > 0 ? roundTo((gasCo2e / total) * 100, 1) : 0,
+      percentage: roundTo((gasCo2e / total) * 100, 1),
     });
   }
   if (oilCo2e > 0) {
     breakdown.push({
       subcategory: 'heating oil',
       co2eKg: roundTo(oilCo2e, 2),
-      percentage: total > 0 ? roundTo((oilCo2e / total) * 100, 1) : 0,
+      percentage: roundTo((oilCo2e / total) * 100, 1),
     });
   }
 

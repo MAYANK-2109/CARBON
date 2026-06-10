@@ -34,10 +34,19 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@ampproject/remapping": "^2.3.0",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.9",
+    "convert-source-map": "^2.0.0",
+    "istanbul-lib-coverage": "^3.2.2",
+    "istanbul-lib-report": "^3.0.1",
+    "istanbul-lib-source-maps": "^5.0.6",
+    "istanbul-reports": "^3.2.0",
+    "magicast": "^0.3.5",
     "supertest": "^7.0.0",
+    "test-exclude": "^7.0.2",
     "ts-node-dev": "^2.0.0",
-    "vitest": "^2.1.4"
+    "v8-to-istanbul": "^9.3.0",
+    "vitest": "2.1.9"
   }
 }
