@@ -9,7 +9,7 @@ export type {
   LoginInput,
   UserProfile,
   AuthResponse,
-} from './types/auth.types.js';
+} from './types/auth.types';
 
 export type {
   VehicleType,
@@ -22,7 +22,7 @@ export type {
   FoodCategory,
   EmissionBreakdown,
   CalculationResult,
-} from './types/calculator.types.js';
+} from './types/calculator.types';
 
 export type {
   EmissionCategory,
@@ -31,20 +31,20 @@ export type {
   TrendDataPoint,
   MonthlyTrend,
   PaginatedHistory,
-} from './types/emission.types.js';
+} from './types/emission.types';
 
 export type {
   ApiResponse,
   ApiError,
   TipImpactLevel,
   ReductionTip,
-} from './types/api.types.js';
+} from './types/api.types';
 
 // ─── Zod Schemas ─────────────────────────────────────────
 export {
   RegisterSchema,
   LoginSchema,
-} from './types/auth.types.js';
+} from './types/auth.types';
 
 export {
   TravelInputSchema,
@@ -54,7 +54,7 @@ export {
   FuelTypes,
   FlightTypes,
   FoodCategories,
-} from './types/calculator.types.js';
+} from './types/calculator.types';
 
 // ─── Constants ───────────────────────────────────────────
 export {
@@ -63,4 +63,4 @@ export {
   DIET_FACTORS,
   CO2E_EQUIVALENTS,
   FREQUENCY_MULTIPLIERS,
-} from './constants/emission-factors.js';
+} from './constants/emission-factors';
