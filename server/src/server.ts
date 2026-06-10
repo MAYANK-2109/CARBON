@@ -23,7 +23,27 @@ import chatRoutes from './features/chat/chat.routes';
 const app = express();
 
 // ─── Security Middleware ─────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:", "http://localhost:*"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+  noSniff: true,
+}));
 
 // Split CORS_ORIGIN by comma to support multiple origins, and fallback to localhost
 const allowedOrigins = (env.CORS_ORIGIN || 'http://localhost:5173')
