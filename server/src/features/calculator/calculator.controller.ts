@@ -86,6 +86,9 @@ export async function handleCalculateDiet(req: Request, res: Response, next: Nex
 /**
  * Persist calculation results to the Emission collection for history tracking.
  * Creates one record per breakdown item to enable granular analysis.
+ * @param userId - Authenticated user's database ID
+ * @param result - The full calculation result with breakdown items
+ * @throws {MongoServerError} if the database write fails
  */
 async function persistEmission(userId: string, result: CalculationResult): Promise<void> {
   const records = result.breakdown.map((item: EmissionBreakdown) => ({

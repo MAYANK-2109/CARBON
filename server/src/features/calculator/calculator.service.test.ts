@@ -155,6 +155,46 @@ describe('calculateTravel', () => {
       roundTo(annualized / CO2E_EQUIVALENTS.kgPerFlightLondonNY, 2)
     );
   });
+
+  it('defaults to petrol when fuelType is omitted for car', () => {
+    const withFuel: TravelInput = {
+      vehicleType: 'car',
+      fuelType: 'petrol',
+      distanceKm: 100,
+      frequency: 'one-time',
+    };
+    const withoutFuel = {
+      vehicleType: 'car' as const,
+      distanceKm: 100,
+      frequency: 'one-time' as const,
+    };
+
+    const resultWithFuel = calculateTravel(withFuel);
+    const resultWithoutFuel = calculateTravel(withoutFuel as TravelInput);
+
+    expect(resultWithoutFuel.totalCo2eKg).toBe(resultWithFuel.totalCo2eKg);
+    expect(resultWithoutFuel.breakdown[0]?.subcategory).toBe('car (petrol)');
+  });
+
+  it('defaults to shortHaul when flightType is omitted for flight', () => {
+    const withFlight: TravelInput = {
+      vehicleType: 'flight',
+      flightType: 'shortHaul',
+      distanceKm: 500,
+      frequency: 'one-time',
+    };
+    const withoutFlight = {
+      vehicleType: 'flight' as const,
+      distanceKm: 500,
+      frequency: 'one-time' as const,
+    };
+
+    const resultWithFlight = calculateTravel(withFlight);
+    const resultWithoutFlight = calculateTravel(withoutFlight as TravelInput);
+
+    expect(resultWithoutFlight.totalCo2eKg).toBe(resultWithFlight.totalCo2eKg);
+    expect(resultWithoutFlight.breakdown[0]?.subcategory).toBe('flight (shortHaul)');
+  });
 });
 
 // ─── Energy Calculator ──────────────────────────────────────
@@ -326,5 +366,20 @@ describe('calculateDiet', () => {
     const result = calculateDiet(input);
 
     expect(result.annualizedCo2eKg).toBe(roundTo(result.totalCo2eKg * 52, 2));
+  });
+
+  it('handles diet items with zero kgPerWeek — percentage defaults to 0', () => {
+    // When all items are 0 kg/week, totalWeekly = 0 and percentage branch hits the `: 0` case
+    const input: DietInput = {
+      items: [
+        { category: 'beef', kgPerWeek: 0 },
+        { category: 'chicken', kgPerWeek: 0 },
+      ],
+    };
+
+    const result = calculateDiet(input);
+
+    expect(result.totalCo2eKg).toBe(0);
+    expect(result.breakdown.every((b) => b.percentage === 0)).toBe(true);
   });
 });

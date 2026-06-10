@@ -1,3 +1,9 @@
+/**
+ * @module features/auth/auth.controller.test
+ * @description Unit tests for authentication request handlers.
+ * Covers all happy paths, error paths, and edge cases.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response } from 'express';
 import { handleRegister, handleLogin, handleLogout, handleRefresh, handleGetProfile } from './auth.controller';
@@ -5,115 +11,190 @@ import * as authService from './auth.service';
 
 vi.mock('./auth.service');
 
+const mockUserProfile = { id: '1', email: 'test@test.com', name: 'Test User', createdAt: new Date().toISOString() };
+
 describe('Auth Controller', () => {
   let mockReq: Partial<Request>;
   let mockRes: Partial<Response>;
-  let mockNext: any;
-  let statusMock: any;
-  let jsonMock: any;
-  let cookieMock: any;
-  let clearCookieMock: any;
+  let mockNext: ReturnType<typeof vi.fn>;
+  let statusMock: ReturnType<typeof vi.fn>;
+  let jsonMock: ReturnType<typeof vi.fn>;
+  let cookieMock: ReturnType<typeof vi.fn>;
+  let clearCookieMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     jsonMock = vi.fn();
     cookieMock = vi.fn();
     clearCookieMock = vi.fn();
+    statusMock = vi.fn().mockReturnValue({ json: jsonMock });
     mockRes = {
       json: jsonMock,
       cookie: cookieMock,
       clearCookie: clearCookieMock,
+      status: statusMock,
     };
-    statusMock = vi.fn().mockReturnValue(mockRes);
-    mockRes.status = statusMock;
     mockNext = vi.fn();
     vi.clearAllMocks();
   });
 
+  // ─── handleRegister ────────────────────────────────────────
+
   describe('handleRegister', () => {
-    it('registers user successfully', async () => {
-      mockReq = { body: { email: 'test@test.com', password: 'pass', name: 'Test' } };
+    it('registers user successfully — sets cookies and responds 201', async () => {
+      mockReq = { body: { email: 'test@test.com', password: 'pass', name: 'Test User' } };
       vi.spyOn(authService, 'registerUser').mockResolvedValue({
-        user: { id: '1', email: 'test@test.com', name: 'Test' } as any,
-        accessToken: 'access',
-        refreshToken: 'refresh',
+        user: mockUserProfile,
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
       });
 
       await handleRegister(mockReq as Request, mockRes as Response, mockNext);
 
-      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'access', expect.any(Object));
-      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'access-token', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'refresh-token', expect.any(Object));
       expect(statusMock).toHaveBeenCalledWith(201);
-      expect(jsonMock).toHaveBeenCalledWith({ success: true, message: 'Account created successfully.', data: { user: expect.any(Object) } });
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        message: 'Account created successfully.',
+        data: { user: mockUserProfile },
+      });
+      expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('handles errors', async () => {
-      mockReq = { body: {} };
-      const error = new Error('Test Error');
+    it('passes error to next when registration fails (duplicate email)', async () => {
+      mockReq = { body: { email: 'existing@test.com', password: 'pass', name: 'Dupe' } };
+      const error = new Error('Email already exists');
       vi.spyOn(authService, 'registerUser').mockRejectedValue(error);
 
       await handleRegister(mockReq as Request, mockRes as Response, mockNext);
+
       expect(mockNext).toHaveBeenCalledWith(error);
+      expect(statusMock).not.toHaveBeenCalled();
     });
   });
 
+  // ─── handleLogin ────────────────────────────────────────
+
   describe('handleLogin', () => {
-    it('logs in user successfully', async () => {
+    it('logs in user successfully — sets cookies and responds 200', async () => {
       mockReq = { body: { email: 'test@test.com', password: 'pass' } };
       vi.spyOn(authService, 'loginUser').mockResolvedValue({
-        user: { id: '1', email: 'test@test.com', name: 'Test' } as any,
-        accessToken: 'access',
-        refreshToken: 'refresh',
+        user: mockUserProfile,
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
       });
 
       await handleLogin(mockReq as Request, mockRes as Response, mockNext);
 
-      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'access', expect.any(Object));
-      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'access-token', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'refresh-token', expect.any(Object));
       expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith({ success: true, message: 'Logged in successfully.', data: { user: expect.any(Object) } });
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        message: 'Logged in successfully.',
+        data: { user: mockUserProfile },
+      });
+    });
+
+    it('passes error to next on invalid credentials', async () => {
+      mockReq = { body: { email: 'wrong@test.com', password: 'wrongpass' } };
+      const error = new Error('Invalid email or password.');
+      vi.spyOn(authService, 'loginUser').mockRejectedValue(error);
+
+      await handleLogin(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+      expect(statusMock).not.toHaveBeenCalled();
     });
   });
 
+  // ─── handleLogout ─────────────────────────────────────
+
   describe('handleLogout', () => {
-    it('clears cookies', () => {
+    it('clears both auth cookies and responds 200', () => {
+      mockReq = {};
       handleLogout(mockReq as Request, mockRes as Response);
+
       expect(clearCookieMock).toHaveBeenCalledWith('accessToken', expect.any(Object));
       expect(clearCookieMock).toHaveBeenCalledWith('refreshToken', expect.any(Object));
       expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith({ success: true, message: 'Logged out successfully.', data: null });
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        message: 'Logged out successfully.',
+        data: null,
+      });
     });
   });
 
+  // ─── handleRefresh ────────────────────────────────────
+
   describe('handleRefresh', () => {
-    it('refreshes tokens', async () => {
-      mockReq = { cookies: { refreshToken: 'oldRefresh' } };
+    it('refreshes tokens and sets new cookies', async () => {
+      mockReq = { cookies: { refreshToken: 'old-refresh-token' } };
       vi.spyOn(authService, 'refreshTokens').mockResolvedValue({
-        accessToken: 'newAccess',
-        refreshToken: 'newRefresh',
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
       });
 
       await handleRefresh(mockReq as Request, mockRes as Response, mockNext);
 
-      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'newAccess', expect.any(Object));
-      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'newRefresh', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('accessToken', 'new-access-token', expect.any(Object));
+      expect(cookieMock).toHaveBeenCalledWith('refreshToken', 'new-refresh-token', expect.any(Object));
       expect(statusMock).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        data: null,
+        message: 'Token refreshed successfully.',
+      });
     });
 
-    it('returns 401 if no refresh token', async () => {
+    it('responds 401 when no refresh token cookie is present', async () => {
       mockReq = { cookies: {} };
+
       await handleRefresh(mockReq as Request, mockRes as Response, mockNext);
+
       expect(statusMock).toHaveBeenCalledWith(401);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        message: 'No refresh token provided.',
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('passes error to next when refresh token is invalid/expired', async () => {
+      mockReq = { cookies: { refreshToken: 'expired-token' } };
+      const error = new Error('Invalid or expired refresh token.');
+      vi.spyOn(authService, 'refreshTokens').mockRejectedValue(error);
+
+      await handleRefresh(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
+  // ─── handleGetProfile ────────────────────────────────
+
   describe('handleGetProfile', () => {
-    it('gets profile', async () => {
-      mockReq = { user: { userId: '1' } as any };
-      vi.spyOn(authService, 'getUserProfile').mockResolvedValue({ id: '1' } as any);
+    it('returns user profile for authenticated request', async () => {
+      mockReq = { user: { userId: 'user-1', email: 'test@test.com' } };
+      vi.spyOn(authService, 'getUserProfile').mockResolvedValue(mockUserProfile);
 
       await handleGetProfile(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(authService.getUserProfile).toHaveBeenCalledWith('user-1');
       expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith({ success: true, data: { user: { id: '1' } } });
+      expect(jsonMock).toHaveBeenCalledWith({ success: true, data: { user: mockUserProfile } });
+    });
+
+    it('passes error to next when user is not found', async () => {
+      mockReq = { user: { userId: 'deleted-user', email: 'gone@test.com' } };
+      const error = new Error('User not found.');
+      vi.spyOn(authService, 'getUserProfile').mockRejectedValue(error);
+
+      await handleGetProfile(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+      expect(statusMock).not.toHaveBeenCalled();
     });
   });
 });

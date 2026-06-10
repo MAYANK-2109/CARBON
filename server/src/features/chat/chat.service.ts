@@ -11,6 +11,12 @@ import type { EmissionSummary } from '@carbon/shared';
 const hasApiKey = env.GEMINI_API_KEY && env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
 const ai = hasApiKey ? new GoogleGenAI({ apiKey: env.GEMINI_API_KEY }) : null;
 
+/** Gemini model used for chat responses */
+const GEMINI_MODEL = 'gemini-2.5-flash';
+
+/** Sampling temperature — balances creativity vs. consistency */
+const GEMINI_TEMPERATURE = 0.7;
+
 interface ChatMessage {
   role: 'user' | 'model';
   content: string;
@@ -75,19 +81,19 @@ ${contextPrompt}`;
     }));
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents,
       config: {
         systemInstruction,
-        temperature: 0.7,
+        temperature: GEMINI_TEMPERATURE,
       },
     });
 
     return response.text || 'I encountered an issue generating a response. Please try again.';
   } catch (error: unknown) {
-    const err = error as Error;
-    console.error('Gemini API Error:', err);
-    return `[Gemini Error] I am currently operating in demo fallback mode because: "${err.message || 'API request failed'}".\n\n${getMockChatResponse(currentMessage, summary)}`;
+    const message = error instanceof Error ? error.message : 'API request failed';
+    console.error('Gemini API Error:', error);
+    return `[Gemini Error] I am currently operating in demo fallback mode because: "${message}".\n\n${getMockChatResponse(currentMessage, summary)}`;
   }
 }
 

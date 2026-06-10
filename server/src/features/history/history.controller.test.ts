@@ -63,6 +63,16 @@ describe('History Controller', () => {
 
       expect(statusMock).toHaveBeenCalledWith(200);
     });
+
+    it('calls next with 400 AppError when date strings are invalid', async () => {
+      mockReq = { query: { start: 'not-a-date', end: '2025-12-31' }, user: { userId: '1' } as any };
+
+      await handleGetSummary(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({ statusCode: 400 })
+      );
+    });
   });
 
   describe('handleGetTrends', () => {
@@ -74,6 +84,16 @@ describe('History Controller', () => {
 
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({ success: true, data: [] });
+    });
+
+    it('handles errors from getMonthlyTrends', async () => {
+      mockReq = { query: {}, user: { userId: '1' } as any };
+      const error = new Error('Trends failed');
+      vi.spyOn(historyService, 'getMonthlyTrends').mockRejectedValue(error);
+
+      await handleGetTrends(mockReq as Request, mockRes as Response, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 });

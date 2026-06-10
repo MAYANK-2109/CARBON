@@ -7,12 +7,16 @@ import mongoose from 'mongoose';
 import { Emission } from '../../models/Emission.model';
 import type { EmissionCategory, EmissionSummary, MonthlyTrend, PaginatedHistory } from '@carbon/shared';
 
+/** Abbreviated month names indexed 1–12 (index 0 is unused) */
+const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
 /**
  * Get paginated emission history for a user.
  * @param userId - User ID
  * @param page - Page number (1-indexed)
  * @param limit - Records per page
  * @param category - Optional category filter
+ * @throws {BSONError} if userId is not a valid 24-character hex ObjectId
  */
 export async function getHistory(
   userId: string,
@@ -57,6 +61,7 @@ export async function getHistory(
  * @param userId - User ID
  * @param startDate - Period start
  * @param endDate - Period end
+ * @throws {BSONError} if userId is not a valid 24-character hex ObjectId
  */
 export async function getSummary(
   userId: string,
@@ -109,6 +114,7 @@ export async function getSummary(
  * Get monthly emission trends for the last N months.
  * @param userId - User ID
  * @param months - Number of months to look back (default 6)
+ * @throws {BSONError} if userId is not a valid 24-character hex ObjectId
  */
 export async function getMonthlyTrends(
   userId: string,
@@ -150,10 +156,8 @@ export async function getMonthlyTrends(
   for (const r of results) {
     const key = `${r._id.year}-${String(r._id.month).padStart(2, '0')}`;
     if (!trendMap.has(key)) {
-      const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       trendMap.set(key, {
-        month: monthNames[r._id.month] || '',
+        month: MONTH_NAMES[r._id.month] || '',
         year: r._id.year,
         totalCo2eKg: 0,
         byCategory: { travel: 0, energy: 0, diet: 0 },

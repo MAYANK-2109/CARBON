@@ -8,6 +8,13 @@ import { ZodError, z } from 'zod';
 import { AppError, errorHandler } from './error.middleware';
 import type { Request, Response, NextFunction } from 'express';
 
+vi.mock('../config/environment', () => ({
+  env: {
+    isProduction: false,
+    NODE_ENV: 'test',
+  },
+}));
+
 // ─── Helpers ─────────────────────────────────────────────
 
 function createMockResponse() {
@@ -75,7 +82,7 @@ describe('errorHandler', () => {
     expect(res.status).toHaveBeenCalledWith(404);
   });
 
-  it('handles generic Error with 500 status', () => {
+  it('handles generic Error with 500 status (dev mode shows message)', () => {
     const error = new Error('Something went wrong');
     const res = createMockResponse();
 
@@ -83,8 +90,44 @@ describe('errorHandler', () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false })
+      expect.objectContaining({ success: false, message: 'Something went wrong' })
     );
+  });
+
+  it('handles MongoServerError duplicate key (code 11000) with 409 status', () => {
+    const error = Object.assign(new Error('E11000 duplicate key error'), {
+      name: 'MongoServerError',
+      code: 11000,
+    });
+    const res = createMockResponse();
+
+    errorHandler(error, mockReq, res, mockNext);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: 'A record with this information already exists.',
+    });
+  });
+
+  it('hides error details in production mode with 500 status', async () => {
+    // Re-mock env as production for this test only
+    const { env } = await import('../config/environment');
+    (env as any).isProduction = true;
+
+    const error = new Error('Secret internal error');
+    const res = createMockResponse();
+
+    errorHandler(error, mockReq, res, mockNext);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: 'An unexpected error occurred. Please try again later.',
+    });
+
+    // Restore
+    (env as any).isProduction = false;
   });
 });
 

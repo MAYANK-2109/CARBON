@@ -5,7 +5,13 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { getHistory, getSummary, getMonthlyTrends } from './history.service';
+import { AppError } from '../../middleware/error.middleware';
 import type { EmissionCategory } from '@carbon/shared';
+
+/** Returns true if the given Date object represents a valid point in time */
+function isValidDate(d: Date): boolean {
+  return !isNaN(d.getTime());
+}
 
 /**
  * GET /api/history
@@ -42,6 +48,10 @@ export async function handleGetSummary(req: Request, res: Response, next: NextFu
     const endDate = req.query['end']
       ? new Date(req.query['end'] as string)
       : now;
+
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      throw new AppError(400, 'Invalid date format. Use ISO 8601 (e.g. 2025-01-01).');
+    }
 
     const result = await getSummary(req.user!.userId, startDate, endDate);
 
