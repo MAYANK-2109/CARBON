@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Route, Salad, Target, TrendingDown } from 'lucide-react';
 
 const SUGGESTIONS = [

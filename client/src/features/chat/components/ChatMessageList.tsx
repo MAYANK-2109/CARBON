@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ChatMessage } from '../../features/chat/chat.api';
+import type { ChatMessage } from '../chat.api';
 import { Markdown } from '../../../components/ui/Markdown';
 
 /**
