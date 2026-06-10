@@ -12,7 +12,7 @@ import { env } from '../../config/environment';
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: env.isProduction,
-  sameSite: env.isProduction ? ('strict' as const) : ('lax' as const),
+  sameSite: env.isProduction ? ('none' as const) : ('lax' as const),
   path: '/',
 };
 
