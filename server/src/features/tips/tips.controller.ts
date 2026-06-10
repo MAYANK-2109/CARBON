@@ -37,7 +37,7 @@ export function handleGetTips(req: Request, res: Response): void {
  * Get personalized tips based on user's highest-emission category.
  * Falls back to general high-impact tips if no history exists.
  */
-export function handleGetPersonalizedTips(req: Request, res: Response): void {
+export function handleGetPersonalizedTips(_req: Request, res: Response): void {
   // For now, return top 5 tips by impact level and savings
   const sorted = [...tipsWithIds].sort((a, b) => {
     const levelOrder: Record<'high' | 'medium' | 'low', number> = { high: 3, medium: 2, low: 1 };

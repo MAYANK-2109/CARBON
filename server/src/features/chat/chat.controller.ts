@@ -6,7 +6,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { generateChatResponse } from './chat.service';
 import { getSummary } from '../history/history.service';
-import { env } from '../../config/environment';
 
 /**
  * Handle POST request for AI Assistant chat.
