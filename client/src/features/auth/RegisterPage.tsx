@@ -46,8 +46,8 @@ export const RegisterPage: React.FC = () => {
       await register(formData);
       success('Your account has been successfully created.', 'Registration Complete');
       navigate('/dashboard', { replace: true });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to register. Please check your information.';
+    } catch (err: any) {
+      const message = err?.message || 'Failed to register. Please check your information.';
       showToastError(message, 'Registration Failed');
     } finally {
       setIsSubmitting(false);
