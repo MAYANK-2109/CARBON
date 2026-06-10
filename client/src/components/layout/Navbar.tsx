@@ -93,11 +93,11 @@ export const Navbar: React.FC = () => {
                 background: 'var(--bg-glass)',
                 transition: 'all var(--transition-fast)'
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.background = 'var(--bg-glass-hover)';
                 e.currentTarget.style.borderColor = 'var(--border-glass-hover)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.background = 'var(--bg-glass)';
                 e.currentTarget.style.borderColor = 'var(--border-glass)';
               }}
@@ -120,11 +120,11 @@ export const Navbar: React.FC = () => {
                 borderRadius: '8px',
                 transition: 'all var(--transition-fast)'
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.boxShadow = 'var(--glow-emerald)';
                 e.currentTarget.style.transform = 'translateY(-1px)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.boxShadow = 'none';
                 e.currentTarget.style.transform = 'none';
               }}

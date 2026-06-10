@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Calculator, 
-  History, 
-  Lightbulb, 
-  LogOut, 
-  ChevronLeft, 
+import {
+  LayoutDashboard,
+  Calculator,
+  History,
+  Lightbulb,
+  LogOut,
+  ChevronLeft,
   ChevronRight,
   Leaf,
   Bot
@@ -23,12 +23,12 @@ export const Sidebar: React.FC = () => {
   };
 
   const navItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-  { name: 'Calculator', path: '/calculator', icon: <Calculator size={20} /> },
-  { name: 'History', path: '/history', icon: <History size={20} /> },
-  { name: 'Reduction Tips', path: '/tips', icon: <Lightbulb size={20} /> },
-  { name: 'AI Assistant', path: '/chat', icon: <Bot size={20} /> },
-];
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'Calculator', path: '/calculator', icon: <Calculator size={20} /> },
+    { name: 'History', path: '/history', icon: <History size={20} /> },
+    { name: 'Reduction Tips', path: '/tips', icon: <Lightbulb size={20} /> },
+    { name: 'AI Assistant', path: '/chat', icon: <Bot size={20} /> },
+  ];
 
   return (
     <aside
@@ -106,7 +106,7 @@ export const Sidebar: React.FC = () => {
           <NavLink
             key={item.name}
             to={item.path}
-            style={({ isActive }) => ({
+            style={({ isActive }: { isActive: boolean }) => ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: isCollapsed ? 'center' : 'flex-start',
@@ -119,7 +119,7 @@ export const Sidebar: React.FC = () => {
               transition: 'all var(--transition-fast)',
               position: 'relative'
             })}
-            className={({ isActive }) => isActive ? 'glass-glow-emerald' : ''}
+            className={({ isActive }: { isActive: boolean }) => isActive ? 'glass-glow-emerald' : ''}
           >
             <span style={{ display: 'flex', flexShrink: 0 }}>{item.icon}</span>
             {!isCollapsed && (
