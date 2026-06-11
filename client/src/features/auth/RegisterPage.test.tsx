@@ -36,23 +36,39 @@ interface MockInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 vi.mock('../../components/ui/Input', () => ({
-  Input: ({ label, error, helperText, ...props }: MockInputProps) => (
-    <div>
-      {label && <label htmlFor={props.id}>{label}</label>}
-      <input
-        {...props}
-      />
-      {error && <span role="alert">{error}</span>}
-    </div>
-  ),
+  Input: (props: MockInputProps) => {
+    const inputProps = { ...props };
+    delete inputProps.label;
+    delete inputProps.error;
+    delete inputProps.helperText;
+    return (
+      <div>
+        {props.label && <label htmlFor={props.id}>{props.label}</label>}
+        <input {...inputProps} />
+        {props.error && <span role="alert">{props.error}</span>}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../components/ui/Button', () => ({
-  Button: ({ isLoading, variant, children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { isLoading?: boolean; variant?: string; children: React.ReactNode }) => (
-    <button {...props} disabled={props.disabled || isLoading}>
-      {children}
-    </button>
-  ),
+  Button: ({
+    children,
+    isLoading,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    isLoading?: boolean;
+    variant?: string;
+    children: React.ReactNode;
+  }) => {
+    const btnProps = { ...props };
+    delete btnProps.variant;
+    return (
+      <button {...btnProps} disabled={btnProps.disabled || isLoading}>
+        {children}
+      </button>
+    );
+  },
 }));
 
 vi.mock('react-router-dom', async () => {

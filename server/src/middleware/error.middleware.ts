@@ -7,6 +7,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { env } from '../config/environment';
+import { logger } from '../utils/logger';
 
 /** Custom application error with status code */
 export class AppError extends Error {
@@ -27,7 +28,7 @@ export class AppError extends Error {
  */
 export function errorHandler(
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ): void {
@@ -36,6 +37,7 @@ export function errorHandler(
     res.status(400).json({
       success: false,
       message: 'Validation failed',
+      requestId: req.id,
       errors: err.errors.map((e) => ({
         field: e.path.join('.'),
         message: e.message,
@@ -49,6 +51,7 @@ export function errorHandler(
     res.status(err.statusCode).json({
       success: false,
       message: err.message,
+      requestId: req.id,
     });
     return;
   }
@@ -58,16 +61,18 @@ export function errorHandler(
     res.status(409).json({
       success: false,
       message: 'A record with this information already exists.',
+      requestId: req.id,
     });
     return;
   }
 
   // Unexpected errors — hide details in production
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error', { requestId: req.id, err: err.message, stack: err.stack });
   res.status(500).json({
     success: false,
     message: env.isProduction
       ? 'An unexpected error occurred. Please try again later.'
       : err.message,
+    requestId: req.id,
   });
 }

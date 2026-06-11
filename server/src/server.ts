@@ -4,14 +4,20 @@
  * Configures middleware stack, mounts API routes, and starts the server.
  */
 
+import http from 'http';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import { env } from './config/environment';
 import { connectDatabase } from './config/database';
 import { generalLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler } from './middleware/error.middleware';
+import { requestId } from './middleware/request-id.middleware';
+import { httpLogger } from './middleware/http-logger.middleware';
+import { logger } from './utils/logger';
+import { setupSwagger } from './config/swagger';
 
 // Feature routes
 import authRoutes from './features/auth/auth.routes';
@@ -21,6 +27,10 @@ import tipsRoutes from './features/tips/tips.routes';
 import chatRoutes from './features/chat/chat.routes';
 
 const app = express();
+
+// ─── Observability Middleware ─────────────────────────────
+app.use(requestId);
+app.use(httpLogger);
 
 // ─── Security Middleware ─────────────────────────────────
 app.use(helmet({
@@ -82,7 +92,14 @@ app.use(cookieParser());
 // ─── Rate Limiting ───────────────────────────────────────
 app.use('/api', generalLimiter);
 
-// ─── API Routes ──────────────────────────────────────────
+// ─── API v1 Routes ───────────────────────────────────────
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/calculate', calculatorRoutes);
+app.use('/api/v1/history', historyRoutes);
+app.use('/api/v1/tips', tipsRoutes);
+app.use('/api/v1/chat', chatRoutes);
+
+// Legacy aliases for backward compatibility
 app.use('/api/auth', authRoutes);
 app.use('/api/calculate', calculatorRoutes);
 app.use('/api/history', historyRoutes);
@@ -91,15 +108,22 @@ app.use('/api/chat', chatRoutes);
 
 // ─── Health Check ────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    },
-  });
+  res
+    .set('Cache-Control', 'no-store')
+    .status(200)
+    .json({
+      success: true,
+      data: {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: 'v1',
+      },
+    });
 });
+
+// ─── API Docs (dev only) ─────────────────────────────────
+if (!env.isProduction) setupSwagger(app);
 
 // ─── Error Handler (must be last) ────────────────────────
 app.use(errorHandler);
@@ -109,7 +133,14 @@ async function start(): Promise<void> {
   try {
     await connectDatabase();
 
-    app.listen(env.PORT, () => {
+    const server = http.createServer(app);
+
+    server.listen(env.PORT, () => {
+      logger.info('Server started', {
+        port: env.PORT,
+        env: env.NODE_ENV,
+        api: `http://localhost:${env.PORT}/api`,
+      });
       console.log(`
 ╔══════════════════════════════════════════════════╗
 ║  🌍 Carbon Footprint Assistant — API Server      ║
@@ -120,8 +151,32 @@ async function start(): Promise<void> {
 ╚══════════════════════════════════════════════════╝
       `);
     });
+
+    // ─── Graceful Shutdown ──────────────────────────────
+    const shutdown = async (signal: string) => {
+      logger.info(`${signal} received — shutting down gracefully`);
+      server.close(async () => {
+        try {
+          await mongoose.connection.close();
+          logger.info('MongoDB connection closed');
+          process.exit(0);
+        } catch (err) {
+          logger.error('Error during shutdown', { err });
+          process.exit(1);
+        }
+      });
+      // Force-kill if it takes too long
+      setTimeout(() => {
+        logger.error('Shutdown timeout — forcing exit');
+        process.exit(1);
+      }, 10_000).unref();
+    };
+
+    process.on('SIGTERM', () => { shutdown('SIGTERM').catch(console.error); });
+    process.on('SIGINT',  () => { shutdown('SIGINT').catch(console.error); });
+
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server', { error });
     process.exit(1);
   }
 }

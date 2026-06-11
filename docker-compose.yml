@@ -1,0 +1,69 @@
+# =============================================================
+# CARBON — Docker Compose for local development
+# =============================================================
+# Usage:
+#   docker compose up          — start all services
+#   docker compose up -d       — start in background
+#   docker compose down -v     — stop and remove volumes
+# =============================================================
+
+version: '3.9'
+
+services:
+  # ─── MongoDB ────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: carbon_mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: carbon-footprint
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', 'db.adminCommand("ping")']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── API Server ─────────────────────────────────────────────
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: carbon_server
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/carbon-footprint
+      NODE_ENV: development
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./server/src:/app/server/src  # live-reload via ts-node-dev
+    command: npm run dev -w server
+
+  # ─── Vite Client ────────────────────────────────────────────
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: carbon_client
+    restart: unless-stopped
+    ports:
+      - '5173:5173'
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    depends_on:
+      - server
+    volumes:
+      - ./client/src:/app/client/src  # live HMR
+    command: npm run dev -w client -- --host
+
+volumes:
+  mongo_data:
