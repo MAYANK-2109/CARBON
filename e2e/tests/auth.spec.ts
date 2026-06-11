@@ -6,7 +6,7 @@ test.describe('Auth Flow', () => {
     await page.goto('/');
     
     // Expect the login heading to be visible
-    await expect(page.locator('h2', { hasText: 'Sign in to Carbon' })).toBeVisible();
+    await expect(page.locator('h2', { hasText: 'Sign In to CARBON' })).toBeVisible();
     
     // Check that there's an email and password input
     await expect(page.getByLabel('Email Address')).toBeVisible();
@@ -17,10 +17,10 @@ test.describe('Auth Flow', () => {
     await page.goto('/login');
     
     // Click the register link
-    await page.getByRole('link', { name: 'Sign up' }).click();
+    await page.getByRole('link', { name: 'Create one free' }).click();
     
     // Should be on register page
     await expect(page).toHaveURL(/.*\/register/);
-    await expect(page.locator('h2', { hasText: 'Create your account' })).toBeVisible();
+    await expect(page.locator('h2', { hasText: 'Create Account' })).toBeVisible();
   });
 });

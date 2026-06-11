@@ -35,21 +35,18 @@ interface MockInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 // Mock Input component
 vi.mock('../../components/ui/Input', () => ({
-  Input: (props: MockInputProps) => (
+  Input: ({ label, error, ...props }: MockInputProps) => (
     <input 
       {...props} 
-      type={props.type} 
-      name={props.name}
-      id={props.id}
     />
   ),
 }));
 
 // Mock Button component  
 vi.mock('../../components/ui/Button', () => ({
-  Button: (props: React.ButtonHTMLAttributes<HTMLButtonElement> & { isLoading?: boolean; variant?: string; children: React.ReactNode }) => (
-    <button {...props} disabled={props.disabled || props.isLoading}>
-      {props.children}
+  Button: ({ isLoading, variant, children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { isLoading?: boolean; variant?: string; children: React.ReactNode }) => (
+    <button {...props} disabled={props.disabled || isLoading}>
+      {children}
     </button>
   ),
 }));

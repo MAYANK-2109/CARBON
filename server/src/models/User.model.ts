@@ -53,6 +53,6 @@ const UserSchema = new Schema<IUser>(
 );
 
 // ─── Indexes ─────────────────────────────────────────────
-UserSchema.index({ email: 1 }, { unique: true });
+// (email index is implicitly created via unique: true on the schema definition)
 
 export const User = mongoose.model<IUser>('User', UserSchema);

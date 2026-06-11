@@ -3,7 +3,7 @@
  * @description Unit tests for the AuthContext provider and its API integrations.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { AuthProvider, AuthContext } from './AuthContext';
 import React, { useContext } from 'react';
 import { api } from '../../lib/api';
@@ -16,7 +16,6 @@ vi.mock('../../lib/api', () => ({
 }));
 
 const mockGet = vi.mocked(api.get);
-const mockPost = vi.mocked(api.post);
 
 const TestComponent = () => {
   const context = useContext(AuthContext);
@@ -85,7 +84,9 @@ describe('AuthContext', () => {
       expect(screen.getByTestId('is-auth').textContent).toBe('true');
     });
 
-    window.dispatchEvent(new CustomEvent('auth:logout'));
+    act(() => {
+      window.dispatchEvent(new CustomEvent('auth:logout'));
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('is-auth').textContent).toBe('false');
